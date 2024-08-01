@@ -33,6 +33,21 @@ const ActivitySchema = new Schema({
         default: 'medium'
     },
 
+    tags: [{
+        type: String,
+        trim: true
+    }],
+
+    category: {
+        type: String,
+        trim: true
+    },
+
+    imageUrl: {
+        type: String,
+        trim: true
+    },
+
     createdAt:{
         type: Date,
         default: Date.now
