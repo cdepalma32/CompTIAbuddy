@@ -5,9 +5,11 @@ const CertificationSchema = new Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
+      trim: true,
     },
     chapters: [
       {
@@ -19,13 +21,9 @@ const CertificationSchema = new Schema(
       type: Number,
       required: true,
     },
-    isPurchased: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically add 'createdAt' and 'updatedAt' fields
   }
 );
 

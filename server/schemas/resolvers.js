@@ -3,6 +3,12 @@ const jwt = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const User = require("./models/User");
 const Certification = require("./models/Certification");
+const Chapter = require("./models/Chapter");
+const Quiz = require("./models/Quiz");
+const Notecard = require("./models/Notecard");
+const Flashcard = require("./models/Flashcard");
+const Activity = require("./models/Activity");
+const DragDrop = require("./models/DragDrop");
 const { AuthenticationError } = require("apollo-server-express");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -16,7 +22,23 @@ const resolvers = {
       throw new AuthenticationError("You need to be logged in!");
     },
     users: async () => User.find(),
-    certifications: async () => Certification.find(),
+    certifications: async (parent, args, context) => {
+      const certifications = await Certification.find().populate("chapters");
+      if (context.user) {
+        const user = await User.findById(context.user._id);
+        const purchasedCertifications = user.purchasedCertifications.map((p) =>
+          p.certificationId.toString()
+        );
+        return certifications.map((cert) => ({
+          ...cert.toObject(),
+          isPurchased: purchasedCertifications.includes(cert._id.toString()),
+        }));
+      }
+      return certifications.map((cert) => ({
+        ...cert.toObject(),
+        isPurchased: false,
+      }));
+    },
     chapters: async (parent, { certificationId }) =>
       Certification.findById(certificationId).populate("chapters"),
     quizzes: async (parent, { chapterId }) =>
@@ -27,6 +49,7 @@ const resolvers = {
       Chapter.findById(chapterId).populate("flashcards"),
     activities: async (parent, { chapterId }) =>
       Chapter.findById(chapterId).populate("activities"),
+    dragDrops: async () => DragDrop.find(),
     progress: async (parent, { userId }) =>
       User.findById(userId).populate("progress.chapterId"),
     quizScores: async (parent, { userId, quizId }) =>

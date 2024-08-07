@@ -144,37 +144,116 @@ const typeDefs = gql`
     _id: ID!
     title: String!
     description: String
-    certification: Certification
     activities: [Activity]
+    isCompleted: Boolean
+    progress: Int
+    estimatedTime: Int
+    grade: Float
+    createdAt: String
+    updatedAt: String
   }
 
   type Quiz {
     _id: ID!
     question: String!
-    answers: [String]
-    correctAnswer: String!
+    answer: String!
+    category: String
     chapter: Chapter
+    difficulty: String
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
   }
 
   type Notecard {
     _id: ID!
-    question: String!
-    answer: String!
+    title: String!
+    content: String!
     chapter: Chapter
+    category: String
+    difficulty: String
+    imageUrl: String
+    activities: [Activity]
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
   }
 
   type Flashcard {
     _id: ID!
     question: String!
     answer: String!
+    category: String
+    activities: [Activity]
     chapter: Chapter
+    difficulty: String
+    imageUrl: String
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
   }
 
   type Activity {
     _id: ID!
+    title: String!
+    description: String
     type: String!
-    content: String!
-    chapter: Chapter
+    questions: [Question]
+    difficulty: String
+    tags: [String]
+    category: String
+    imageUrl: String
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Question {
+    question: String
+    options: [String]
+    correctAnswer: String
+  }
+
+  type DragDrop {
+    _id: ID!
+    title: String!
+    description: String
+    category: String
+    difficulty: String
+    imageUrl: String
+    activities: [Activity]
+    notes: [Note]
+    tags: [String]
+    items: [Item]
+    dropZones: [DropZone]
+    correctMapping: [CorrectMapping]
+    state: JSON
+    isCompleted: Boolean
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Note {
+    user: User
+    text: String
+    createdAt: String
+  }
+
+  type Item {
+    name: String!
+    id: ID!
+  }
+
+  type DropZone {
+    name: String!
+    id: ID!
+  }
+
+  type CorrectMapping {
+    itemId: ID!
+    dropZoneId: ID!
   }
 
   type Query {
@@ -186,6 +265,7 @@ const typeDefs = gql`
     notecards(chapterId: ID!): [Notecard]
     flashcards(chapterId: ID!): [Flashcard]
     activities(chapterId: ID!): [Activity]
+    dragDrops: [DragDrop]
     progress(userId: ID!): [ChapterProgress]
     quizScores(userId: ID!, quizId: ID!): [Score]
     studySessions(userId: ID!): [StudySession]
@@ -244,8 +324,8 @@ const typeDefs = gql`
     ): Quiz
     deleteQuiz(quizId: ID!): Quiz
 
-    addNotecard(chapterId: ID!, question: String!, answer: String!): Notecard
-    updateNotecard(notecardId: ID!, question: String, answer: String): Notecard
+    addNotecard(chapterId: ID!, title: String!, content: String!): Notecard
+    updateNotecard(notecardId: ID!, title: String, content: String): Notecard
     deleteNotecard(notecardId: ID!): Notecard
 
     addFlashcard(chapterId: ID!, question: String!, answer: String!): Flashcard
@@ -259,6 +339,39 @@ const typeDefs = gql`
     addActivity(chapterId: ID!, type: String!, content: String!): Activity
     updateActivity(activityId: ID!, type: String, content: String): Activity
     deleteActivity(activityId: ID!): Activity
+
+    addDragDrop(
+      title: String!
+      description: String
+      category: String
+      difficulty: String
+      imageUrl: String
+      activities: [ID]
+      notes: [NoteInput]
+      tags: [String]
+      items: [ItemInput]
+      dropZones: [DropZoneInput]
+      correctMapping: [CorrectMappingInput]
+      state: JSON
+      isCompleted: Boolean
+    ): DragDrop
+    updateDragDrop(
+      dragDropId: ID!
+      title: String
+      description: String
+      category: String
+      difficulty: String
+      imageUrl: String
+      activities: [ID]
+      notes: [NoteInput]
+      tags: [String]
+      items: [ItemInput]
+      dropZones: [DropZoneInput]
+      correctMapping: [CorrectMappingInput]
+      state: JSON
+      isCompleted: Boolean
+    ): DragDrop
+    deleteDragDrop(dragDropId: ID!): DragDrop
 
     saveProgress(userId: ID!, chapterId: ID!, completion: Int!): User
     deleteProgress(userId: ID!, chapterId: ID!): User
@@ -339,6 +452,24 @@ const typeDefs = gql`
     functional: Boolean
     analytics: Boolean
     marketing: Boolean
+  }
+
+  input NoteInput {
+    user: ID!
+    text: String
+  }
+
+  input ItemInput {
+    name: String!
+  }
+
+  input DropZoneInput {
+    name: String!
+  }
+
+  input CorrectMappingInput {
+    itemId: ID!
+    dropZoneId: ID!
   }
 `;
 
