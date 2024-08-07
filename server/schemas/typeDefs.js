@@ -77,7 +77,7 @@ const typeDefs = gql`
 
   type StudySession {
     date: String
-    duration: Int # Duration in minutes
+    duration: Int
     activityType: String
   }
 
