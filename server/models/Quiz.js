@@ -1,65 +1,72 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
 
-const QuizSchema = new Schema({
+const QuizSchema = new Schema(
+  {
     question: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     answer: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     category: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
 
     chapter: {
-        type: Schema.Types.ObjectId,
-        ref: 'Chapter'
+      type: Schema.Types.ObjectId,
+      ref: "Chapter",
     },
 
     difficulty: {
-        type: String,
-        enum: ['easy', 'medium', 'hard'], // Difficulty levels
-        default: 'medium'
+      type: String,
+      enum: ["easy", "medium", "hard"], // Difficulty levels
+      default: "medium",
     },
 
-    notes: [{
+    notes: [
+      {
         user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+          type: Schema.Types.ObjectId,
+          ref: "User",
         },
         text: String,
         createdAt: {
-            type: Date,
-            default: Date.now
-        }
-    }],
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
 
-    tags: [{
+    tags: [
+      {
         type: String,
-        trim: true
-    }],
+        trim: true,
+      },
+    ],
 
     createdAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
 
     updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-}, {
-    timestamps: true
-});
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
-const Quiz = mongoose.model('Quiz', QuizSchema);
+const Quiz = mongoose.model("Quiz", QuizSchema);
 
 module.exports = Quiz;
