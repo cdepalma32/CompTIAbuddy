@@ -1,74 +1,84 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
 
-const FlashcardSchema = new Schema({
+const FlashcardSchema = new Schema(
+  {
     question: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     answer: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     category: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
 
-    activities: [{
+    activities: [
+      {
         type: Schema.Types.ObjectId,
-        ref: 'Activity'
-    }],
+        ref: "Activity",
+      },
+    ],
 
     chapter: {
-        type: Schema.Types.ObjectId,
-        ref: 'Chapter'
+      type: Schema.Types.ObjectId,
+      ref: "Chapter",
     },
 
     difficulty: {
-        type: String,
-        enum: ['easy', 'medium', 'hard'], // Difficulty levels
-        default: 'medium'
+      type: String,
+      enum: ["easy", "medium", "hard"], // Difficulty levels
+      default: "medium",
     },
 
     imageUrl: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
 
-    notes: [{
+    notes: [
+      {
         user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+          type: Schema.Types.ObjectId,
+          ref: "User",
         },
         text: String,
         createdAt: {
-            type: Date,
-            default: Date.now
-        }
-    }],
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
 
-    tags: [{
+    tags: [
+      {
         type: String,
-        trim: true
-    }],
-    
+        trim: true,
+      },
+    ],
+
     createdAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
 
     updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-}, {
-    timestamps: true
-});
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-const Flashcard = mongoose.model('Flashcard', FlashcardSchema);
+const Flashcard = mongoose.model("Flashcard", FlashcardSchema);
 
 module.exports = Flashcard;

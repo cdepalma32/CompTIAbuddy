@@ -1,62 +1,66 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
 
-const ChapterSchema = new Schema({
+const ChapterSchema = new Schema(
+  {
     title: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     description: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
 
-    activities: [{
+    activities: [
+      {
         type: Schema.Types.ObjectId,
-        ref:'Activity'
-    }],
+        ref: "Activity",
+      },
+    ],
 
     isCompleted: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
 
     progress: {
-        type: Number, // percentage can go here
-        default: 0
+      type: Number, // percentage can go here
+      default: 0,
     },
 
     estimatedTime: {
-        type: Number, // e.g., time in minutes
-        default: 0
+      type: Number, // e.g., time in minutes
+      default: 0,
     },
 
     grade: {
-        type: Number, 
-        default: null
-    }, 
+      type: Number,
+      default: null,
+    },
 
     createdAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
 
     updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-}, {
-    timestamps: true
-});
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-const Chapter = model('Chapter', ChapterSchema);
+const Chapter = model("Chapter", ChapterSchema);
 
 module.exports = Chapter;
 
-
-
-// NOTES : 
+// NOTES :
 // potential extra fields: ???
 
 // user adds comments / notes to each chapter

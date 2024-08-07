@@ -1,14 +1,14 @@
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const User = require("./models/User");
-const Certification = require("./models/Certification");
-const Chapter = require("./models/Chapter");
-const Quiz = require("./models/Quiz");
-const Notecard = require("./models/Notecard");
-const Flashcard = require("./models/Flashcard");
-const Activity = require("./models/Activity");
-const DragDrop = require("./models/DragDrop");
+const User = require("../models/User");
+const Certification = require("../models/Certification");
+const Chapter = require("../models/Chapter");
+const Quiz = require("../models/Quiz");
+const Notecard = require("../models/Notecard");
+const Flashcard = require("../models/Flashcard");
+const Activity = require("../models/Activity");
+const DragDrop = require("../models/DragDrop");
 const { AuthenticationError } = require("apollo-server-express");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
