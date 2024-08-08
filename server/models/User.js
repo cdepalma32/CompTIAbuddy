@@ -23,6 +23,7 @@ const UserSchema = new Schema(
     googleId: {
       type: String,
       unique: true,
+      // sparse: true // allows sparse index to handle null values
     },
     profilePicture: {
       type: String,
