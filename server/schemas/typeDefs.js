@@ -261,13 +261,21 @@ const typeDefs = gql`
   type Query {
     me: User
     users: [User]
+    user(id: ID!): User
     certifications: [Certification]
+    certification(id: ID!): Certification
     chapters(certificationId: ID!): [Chapter]
+    chapter(id: ID!): Chapter
     quizzes(chapterId: ID!): [Quiz]
+    quiz(id: ID!): Quiz
     notecards(chapterId: ID!): [Notecard]
+    notecard(id: ID!): Notecard
     flashcards(chapterId: ID!): [Flashcard]
+    flashcard(id: ID!): Flashcard
     activities(chapterId: ID!): [Activity]
+    activity(id: ID!): Activity
     dragDrops: [DragDrop]
+    dragDrop(id: ID!): DragDrop
     progress(userId: ID!): [ChapterProgress]
     quizScores(userId: ID!, quizId: ID!): [Score]
     studySessions(userId: ID!): [StudySession]
@@ -277,11 +285,13 @@ const typeDefs = gql`
 
   type Mutation {
     loginWithGoogle(token: String!): Auth
+    login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth
     updateUser(
       userId: ID!
       username: String
       email: String
+      password: String
       settings: SettingsInput
     ): User
     deleteUser(userId: ID!): User
