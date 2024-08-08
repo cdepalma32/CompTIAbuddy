@@ -1,5 +1,6 @@
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const User = require("../models/User");
 const Certification = require("../models/Certification");
@@ -22,6 +23,8 @@ const resolvers = {
       throw new AuthenticationError("You need to be logged in!");
     },
     users: async () => User.find(),
+    user: async (parent, { id }) => User.findById(id),
+
     certifications: async (parent, args, context) => {
       const certifications = await Certification.find().populate("chapters");
       if (context.user) {
@@ -39,17 +42,33 @@ const resolvers = {
         isPurchased: false,
       }));
     },
+    certification: async (parent, { id }) =>
+      Certification.findById(id).populate("chapters"),
+
     chapters: async (parent, { certificationId }) =>
       Certification.findById(certificationId).populate("chapters"),
+    chapter: async (parent, { id }) =>
+      Chapter.findById(id).populate("activities"),
+
     quizzes: async (parent, { chapterId }) =>
       Chapter.findById(chapterId).populate("quizzes"),
+    quiz: async (parent, { id }) => Quiz.findById(id),
+
     notecards: async (parent, { chapterId }) =>
       Chapter.findById(chapterId).populate("notecards"),
+    notecard: async (parent, { id }) => Notecard.findById(id),
+
     flashcards: async (parent, { chapterId }) =>
       Chapter.findById(chapterId).populate("flashcards"),
+    flashcard: async (parent, { id }) => Flashcard.findById(id),
+
     activities: async (parent, { chapterId }) =>
       Chapter.findById(chapterId).populate("activities"),
+    activity: async (parent, { id }) => Activity.findById(id),
+
     dragDrops: async () => DragDrop.find(),
+    dragDrop: async (parent, { id }) => DragDrop.findById(id),
+
     progress: async (parent, { userId }) =>
       User.findById(userId).populate("progress.chapterId"),
     quizScores: async (parent, { userId, quizId }) =>
@@ -86,30 +105,88 @@ const resolvers = {
 
       return { token: authToken, user };
     },
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new AuthenticationError("Invalid credentials");
+      }
+
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
+        throw new AuthenticationError("Invalid credentials");
+      }
+
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      return { token, user };
+    },
     addUser: async (parent, args) => {
-      const user = await User.create(args);
+      const hashedPassword = await bcrypt.hash(args.password, 10);
+      const user = await User.create({ ...args, password: hashedPassword });
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
       return { token, user };
     },
-    updateUser: async (parent, { userId, username, email, settings }) => {
-      const user = await User.findByIdAndUpdate(
-        userId,
-        { username, email, settings },
-        { new: true }
-      );
+    updateUser: async (
+      parent,
+      { userId, username, email, password, settings }
+    ) => {
+      const updates = { username, email, settings };
+      if (password) {
+        updates.password = await bcrypt.hash(password, 10);
+      }
+      const user = await User.findByIdAndUpdate(userId, updates, { new: true });
       return user;
     },
     deleteUser: async (parent, { userId }) => {
       await User.findByIdAndDelete(userId);
       return `User with id ${userId} was deleted.`;
     },
+
     addCertification: async (parent, args) => Certification.create(args),
     updateCertification: async (parent, { certificationId, ...updates }) =>
       Certification.findByIdAndUpdate(certificationId, updates, { new: true }),
     deleteCertification: async (parent, { certificationId }) =>
       Certification.findByIdAndDelete(certificationId),
+
+    addChapter: async (parent, args) => Chapter.create(args),
+    updateChapter: async (parent, { chapterId, ...updates }) =>
+      Chapter.findByIdAndUpdate(chapterId, updates, { new: true }),
+    deleteChapter: async (parent, { chapterId }) =>
+      Chapter.findByIdAndDelete(chapterId),
+
+    addQuiz: async (parent, args) => Quiz.create(args),
+    updateQuiz: async (parent, { quizId, ...updates }) =>
+      Quiz.findByIdAndUpdate(quizId, updates, { new: true }),
+    deleteQuiz: async (parent, { quizId }) => Quiz.findByIdAndDelete(quizId),
+
+    addNotecard: async (parent, args) => Notecard.create(args),
+    updateNotecard: async (parent, { notecardId, ...updates }) =>
+      Notecard.findByIdAndUpdate(notecardId, updates, { new: true }),
+    deleteNotecard: async (parent, { notecardId }) =>
+      Notecard.findByIdAndDelete(notecardId),
+
+    addFlashcard: async (parent, args) => Flashcard.create(args),
+    updateFlashcard: async (parent, { flashcardId, ...updates }) =>
+      Flashcard.findByIdAndUpdate(flashcardId, updates, { new: true }),
+    deleteFlashcard: async (parent, { flashcardId }) =>
+      Flashcard.findByIdAndDelete(flashcardId),
+
+    addActivity: async (parent, args) => Activity.create(args),
+    updateActivity: async (parent, { activityId, ...updates }) =>
+      Activity.findByIdAndUpdate(activityId, updates, { new: true }),
+    deleteActivity: async (parent, { activityId }) =>
+      Activity.findByIdAndDelete(activityId),
+
+    addDragDrop: async (parent, args) => DragDrop.create(args),
+    updateDragDrop: async (parent, { dragDropId, ...updates }) =>
+      DragDrop.findByIdAndUpdate(dragDropId, updates, { new: true }),
+    deleteDragDrop: async (parent, { dragDropId }) =>
+      DragDrop.findByIdAndDelete(dragDropId),
+
     purchaseCertification: async (
       parent,
       { certificationId, paymentMethodId, amount },
