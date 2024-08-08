@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-//TODO: this is just an example query, add your own mutations.
+
+// Mutation to log in a user with email and password
 export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -7,11 +8,13 @@ export const LOGIN_USER = gql`
       user {
         _id
         username
+        email
       }
     }
   }
 `;
 
+// Mutation to log in a user with Google
 export const LOGIN_WITH_GOOGLE = gql`
   mutation loginWithGoogle($token: String!) {
     loginWithGoogle(token: $token) {
@@ -26,6 +29,7 @@ export const LOGIN_WITH_GOOGLE = gql`
   }
 `;
 
+// Mutation to add a new user Note: password is not required because it is handled by Auth.js and
 export const ADD_USER = gql`
   mutation addUser($username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
@@ -39,17 +43,20 @@ export const ADD_USER = gql`
   }
 `;
 
+// Mutation to update user information
 export const UPDATE_USER = gql`
   mutation updateUser(
     $userId: ID!
     $username: String
     $email: String
+    $password: String
     $settings: SettingsInput
   ) {
     updateUser(
       userId: $userId
       username: $username
       email: $email
+      password: $password
       settings: $settings
     ) {
       _id
@@ -97,6 +104,7 @@ export const UPDATE_USER = gql`
   }
 `;
 
+// Mutation to delete a user
 export const DELETE_USER = gql`
   mutation deleteUser($userId: ID!) {
     deleteUser(userId: $userId) {

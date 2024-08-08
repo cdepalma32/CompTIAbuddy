@@ -1,16 +1,20 @@
 const { OAuth2Client } = require("google-auth-library");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const User = require("../models/User");
-const Certification = require("../models/Certification");
-const Chapter = require("../models/Chapter");
-const Quiz = require("../models/Quiz");
-const Notecard = require("../models/Notecard");
-const Flashcard = require("../models/Flashcard");
-const Activity = require("../models/Activity");
-const DragDrop = require("../models/DragDrop");
-const { AuthenticationError } = require("apollo-server-express");
+const {
+  User,
+  Certification,
+  Chapter,
+  Quiz,
+  Notecard,
+  Flashcard,
+  Activity,
+  DragDrop,
+} = require("../models");
+const {
+  signToken,
+  authMiddleware,
+  AuthenticationError,
+} = require("../utils/auth");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -20,7 +24,7 @@ const resolvers = {
       if (context.user) {
         return User.findById(context.user._id);
       }
-      throw new AuthenticationError("You need to be logged in!");
+      throw new AuthenticationError();
     },
     users: async () => User.find(),
     user: async (parent, { id }) => User.findById(id),
@@ -99,9 +103,7 @@ const resolvers = {
         });
       }
 
-      const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const authToken = signToken(user);
 
       return { token: authToken, user };
     },
@@ -111,23 +113,18 @@ const resolvers = {
         throw new AuthenticationError("Invalid credentials");
       }
 
-      const isValid = await bcrypt.compare(password, user.password);
+      const isValid = await user.isCorrectPassword(password);
       if (!isValid) {
         throw new AuthenticationError("Invalid credentials");
       }
 
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = signToken(user);
 
       return { token, user };
     },
-    addUser: async (parent, args) => {
-      const hashedPassword = await bcrypt.hash(args.password, 10);
-      const user = await User.create({ ...args, password: hashedPassword });
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+    addUser: async (parent, { username, email, password }) => {
+      const user = await User.create({ username, email, password });
+      const token = signToken(user);
       return { token, user };
     },
     updateUser: async (
