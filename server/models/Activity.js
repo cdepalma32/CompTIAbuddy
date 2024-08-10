@@ -23,6 +23,13 @@ const ActivitySchema = new Schema(
       required: true,
     },
 
+    // the content of the activity
+    content: {
+      type: String, // Add this line for content field
+      required: true,
+      trim: true,
+    },
+
     questions: [
       {
         question: String,

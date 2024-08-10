@@ -14,10 +14,31 @@ const ChapterSchema = new Schema(
       trim: true,
     },
 
-    activities: [
+    quizzes: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Activity",
+        ref: "Quiz",
+      },
+    ],
+
+    notecards: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Notecard",
+      },
+    ],
+
+    flashcards: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Flashcard",
+      },
+    ],
+
+    dragdrops: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "DragDrop",
       },
     ],
 

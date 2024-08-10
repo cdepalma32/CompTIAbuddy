@@ -146,7 +146,10 @@ const typeDefs = gql`
     _id: ID!
     title: String!
     description: String
-    activities: [Activity]
+    quizzes: [Quiz]
+    notecards: [Notecard]
+    flashcards: [Flashcard]
+    dragdrops: [DragDrop]
     isCompleted: Boolean
     progress: Int
     estimatedTime: Int
@@ -176,7 +179,6 @@ const typeDefs = gql`
     category: String
     difficulty: String
     imageUrl: String
-    activities: [Activity]
     notes: [Note]
     tags: [String]
     createdAt: String
@@ -188,7 +190,6 @@ const typeDefs = gql`
     question: String!
     answer: String!
     category: String
-    activities: [Activity]
     chapter: Chapter
     difficulty: String
     imageUrl: String
@@ -198,26 +199,6 @@ const typeDefs = gql`
     updatedAt: String
   }
 
-  type Activity {
-    _id: ID!
-    title: String!
-    description: String
-    type: String!
-    questions: [Question]
-    difficulty: String
-    tags: [String]
-    category: String
-    imageUrl: String
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Question {
-    question: String
-    options: [String]
-    correctAnswer: String
-  }
-
   type DragDrop {
     _id: ID!
     title: String!
@@ -225,7 +206,6 @@ const typeDefs = gql`
     category: String
     difficulty: String
     imageUrl: String
-    activities: [Activity]
     notes: [Note]
     tags: [String]
     items: [Item]
@@ -272,8 +252,6 @@ const typeDefs = gql`
     notecard(id: ID!): Notecard
     flashcards(chapterId: ID!): [Flashcard]
     flashcard(id: ID!): Flashcard
-    activities(chapterId: ID!): [Activity]
-    activity(id: ID!): Activity
     dragDrops: [DragDrop]
     dragDrop(id: ID!): DragDrop
     progress(userId: ID!): [ChapterProgress]
@@ -348,17 +326,12 @@ const typeDefs = gql`
     ): Flashcard
     deleteFlashcard(flashcardId: ID!): Flashcard
 
-    addActivity(chapterId: ID!, type: String!, content: String!): Activity
-    updateActivity(activityId: ID!, type: String, content: String): Activity
-    deleteActivity(activityId: ID!): Activity
-
     addDragDrop(
       title: String!
       description: String
       category: String
       difficulty: String
       imageUrl: String
-      activities: [ID]
       notes: [NoteInput]
       tags: [String]
       items: [ItemInput]
@@ -374,7 +347,6 @@ const typeDefs = gql`
       category: String
       difficulty: String
       imageUrl: String
-      activities: [ID]
       notes: [NoteInput]
       tags: [String]
       items: [ItemInput]

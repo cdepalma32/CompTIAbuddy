@@ -9,10 +9,10 @@ module.exports = {
   GraphQLError: GraphQLError,
   AuthenticationError: AuthenticationError,
   authMiddleware: function ({ req }) {
-    console.log("authMiddleware");
-    console.log("req.body.token", req.body.token);
-    console.log("req.query.token", req.query.token);
-    console.log("req.headers.token", req.headers.authorization);
+    // console.log("authMiddleware");
+    // console.log("req.body.token", req.body.token);
+    // console.log("req.query.token", req.query.token);
+    // console.log("req.headers.token", req.headers.authorization);
     // allows token to be sent via req.body, req.query, or headers
     let token = req.body.token || req.query.token || req.headers.authorization;
 
@@ -21,10 +21,10 @@ module.exports = {
       token = token.split(" ").pop().trim();
     }
 
-    console.log("token", token);
+    // console.log("token", token);
 
     if (!token) {
-      console.log("No token in auth.js");
+      // console.log("No token in auth.js");
       return req;
     }
 
@@ -32,7 +32,7 @@ module.exports = {
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       req.user = data;
     } catch {
-      console.log("Invalid token");
+      // console.log("Invalid token");
     }
 
     return req;
