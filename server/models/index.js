@@ -1,16 +1,16 @@
-const Activity = require('./Activity');
-const Certification = require('./Certification');
-const Chapter = require('./Chapter');
-const Flashcard = require('./Flashcard');
-const Notecard = require('./Notecard');
-const PaymentMethod = require('./paymentMethod');
-const Quiz = require('./Quiz');
-const Transaction = require('./Transaction');
-const User = require('./User');
+// const Activity = require('./Activity');
+const Certification = require("./Certification");
+const Chapter = require("./Chapter");
+const Flashcard = require("./Flashcard");
+const Notecard = require("./Notecard");
+const PaymentMethod = require("./paymentMethod");
+const Quiz = require("./Quiz");
+const Transaction = require("./Transaction");
+const User = require("./User");
 
 // Export all models as an object
 module.exports = {
-  Activity,
+  // Activity,
   Certification,
   Chapter,
   Flashcard,
@@ -18,9 +18,8 @@ module.exports = {
   PaymentMethod,
   Quiz,
   Transaction,
-  User
+  User,
 };
 
 // module.exports = { User };
-    // not sure if this update is what we need to the models' index.js -- temporarily commented out, above's module.exports...
-
+// not sure if this update is what we need to the models' index.js -- temporarily commented out, above's module.exports...
