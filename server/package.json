@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "watch": "nodemon",
-    "seed": "node config/seeds.js"
+    "seed": "node utils/seed.js",
+    "clear-db": "node utils/clearDatabase.js",
+    "clear-users": "node utils/clearDatabase.js User users"
   },
   "keywords": [],
   "author": "",

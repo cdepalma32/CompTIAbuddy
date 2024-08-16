@@ -1,3 +1,19 @@
+/* ADDED .app-wrapper & .main-content!!!!!!! */
+
+/* Ensures the wrapper takes up the full height of the viewport */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Styles for the main content area */
+.main-content {
+  flex: 1; /* Allows the main content area to expand and take up available space */
+  padding: 1rem; /* Adds padding around the main content */
+  /* Add additional styles as needed for your main content area */
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;

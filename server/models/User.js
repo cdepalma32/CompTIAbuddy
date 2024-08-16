@@ -23,10 +23,11 @@ const UserSchema = new Schema(
     googleId: {
       type: String,
       unique: true,
-      // sparse: true // allows sparse index to handle null values
+      sparse: true, // This allows multiple `null` values for the googleId field
     },
     profilePicture: {
       type: String,
+      default: "default-profile.png", // Consider setting a default value
     },
     settings: {
       profileSettings: {
@@ -151,6 +152,17 @@ UserSchema.pre("save", async function (next) {
 UserSchema.methods.isCorrectPassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
+
+// Custom validation for googleId uniqueness
+UserSchema.path("googleId").validate(async function (value) {
+  if (value) {
+    const count = await mongoose.models.User.countDocuments({
+      googleId: value,
+    });
+    return count === 0;
+  }
+  return true; // No validation if googleId is null
+}, "Google ID must be unique");
 
 const User = model("User", UserSchema);
 

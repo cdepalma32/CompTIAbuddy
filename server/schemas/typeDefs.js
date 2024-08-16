@@ -22,6 +22,124 @@ const typeDefs = gql`
     transactionHistory: [Transaction]
   }
 
+  type Certification {
+    _id: ID!
+    title: String!
+    description: String
+    chapters: [Chapter]
+    price: Float!
+  }
+
+  # This type might be optional if you prefer using Certification type for both cases.
+  type PublicCertification {
+    _id: ID!
+    title: String!
+    description: String
+    price: Float!
+  }
+
+  type CertificationPurchase {
+    certificationId: ID!
+    purchaseDate: String
+    price: Float
+  }
+
+  type Chapter {
+    _id: ID!
+    title: String!
+    description: String
+    quizzes: [Quiz]
+    notecards: [Notecard]
+    flashcards: [Flashcard]
+    dragdrops: [DragDrop]
+    isCompleted: Boolean
+    progress: Int
+    estimatedTime: Int
+    grade: Float
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Quiz {
+    _id: ID!
+    question: String!
+    answer: String!
+    category: String
+    chapter: Chapter
+    difficulty: String
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Notecard {
+    _id: ID!
+    title: String!
+    content: String!
+    chapter: Chapter
+    category: String
+    difficulty: String
+    imageUrl: String
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Flashcard {
+    _id: ID!
+    question: String!
+    answer: String!
+    category: String
+    chapter: Chapter
+    difficulty: String
+    imageUrl: String
+    notes: [Note]
+    tags: [String]
+    createdAt: String
+    updatedAt: String
+  }
+
+  type DragDrop {
+    _id: ID!
+    title: String!
+    description: String
+    category: String
+    difficulty: String
+    imageUrl: String
+    notes: [Note]
+    tags: [String]
+    items: [Item]
+    dropZones: [DropZone]
+    correctMapping: [CorrectMapping]
+    state: JSON
+    isCompleted: Boolean
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Note {
+    user: User
+    text: String
+    createdAt: String
+  }
+
+  type Item {
+    name: String!
+    id: ID!
+  }
+
+  type DropZone {
+    name: String!
+    id: ID!
+  }
+
+  type CorrectMapping {
+    itemId: ID!
+    dropZoneId: ID!
+  }
+
   type Settings {
     profileSettings: ProfileSettings
     accessibility: AccessibilitySettings
@@ -101,19 +219,14 @@ const typeDefs = gql`
     score: Int
   }
 
-  type Certification {
+  type Transaction {
     _id: ID!
-    title: String!
-    description: String
-    chapters: [Chapter]
-    price: Float!
-    isPurchased: Boolean!
-  }
-
-  type CertificationPurchase {
-    certificationId: ID!
-    purchaseDate: String
-    price: Float
+    stripeTransactionId: String!
+    amount: Float
+    currency: String
+    status: String
+    created: String
+    certificationId: ID
   }
 
   type PaymentMethod {
@@ -126,144 +239,18 @@ const typeDefs = gql`
     isDefault: Boolean
   }
 
-  type Transaction {
-    _id: ID!
-    stripeTransactionId: String!
-    amount: Float
-    currency: String
-    status: String
-    created: String
-    certificationId: ID
-  }
-
   type PaymentIntent {
     clientSecret: String!
     amount: Float!
     currency: String!
   }
 
-  type Chapter {
-    _id: ID!
-    title: String!
-    description: String
-    activities: [Activity]
-    isCompleted: Boolean
-    progress: Int
-    estimatedTime: Int
-    grade: Float
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Quiz {
-    _id: ID!
-    question: String!
-    answer: String!
-    category: String
-    chapter: Chapter
-    difficulty: String
-    notes: [Note]
-    tags: [String]
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Notecard {
-    _id: ID!
-    title: String!
-    content: String!
-    chapter: Chapter
-    category: String
-    difficulty: String
-    imageUrl: String
-    activities: [Activity]
-    notes: [Note]
-    tags: [String]
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Flashcard {
-    _id: ID!
-    question: String!
-    answer: String!
-    category: String
-    activities: [Activity]
-    chapter: Chapter
-    difficulty: String
-    imageUrl: String
-    notes: [Note]
-    tags: [String]
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Activity {
-    _id: ID!
-    title: String!
-    description: String
-    type: String!
-    questions: [Question]
-    difficulty: String
-    tags: [String]
-    category: String
-    imageUrl: String
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Question {
-    question: String
-    options: [String]
-    correctAnswer: String
-  }
-
-  type DragDrop {
-    _id: ID!
-    title: String!
-    description: String
-    category: String
-    difficulty: String
-    imageUrl: String
-    activities: [Activity]
-    notes: [Note]
-    tags: [String]
-    items: [Item]
-    dropZones: [DropZone]
-    correctMapping: [CorrectMapping]
-    state: JSON
-    isCompleted: Boolean
-    createdAt: String
-    updatedAt: String
-  }
-
-  type Note {
-    user: User
-    text: String
-    createdAt: String
-  }
-
-  type Item {
-    name: String!
-    id: ID!
-  }
-
-  type DropZone {
-    name: String!
-    id: ID!
-  }
-
-  type CorrectMapping {
-    itemId: ID!
-    dropZoneId: ID!
-  }
-
   type Query {
     me: User
     users: [User]
     user(id: ID!): User
-    certifications: [Certification]
-    certification(id: ID!): Certification
+    certifications: [Certification] # or [PublicCertification]
+    certification(id: ID!): Certification # or PublicCertification if certification is not purchased
     chapters(certificationId: ID!): [Chapter]
     chapter(id: ID!): Chapter
     quizzes(chapterId: ID!): [Quiz]
@@ -272,8 +259,6 @@ const typeDefs = gql`
     notecard(id: ID!): Notecard
     flashcards(chapterId: ID!): [Flashcard]
     flashcard(id: ID!): Flashcard
-    activities(chapterId: ID!): [Activity]
-    activity(id: ID!): Activity
     dragDrops: [DragDrop]
     dragDrop(id: ID!): DragDrop
     progress(userId: ID!): [ChapterProgress]
@@ -281,6 +266,7 @@ const typeDefs = gql`
     studySessions(userId: ID!): [StudySession]
     transactions(userId: ID!): [Transaction]
     paymentMethods(userId: ID!): [PaymentMethod]
+    certificationPurchase(id: ID!): CertificationPurchase
   }
 
   type Mutation {
@@ -348,17 +334,12 @@ const typeDefs = gql`
     ): Flashcard
     deleteFlashcard(flashcardId: ID!): Flashcard
 
-    addActivity(chapterId: ID!, type: String!, content: String!): Activity
-    updateActivity(activityId: ID!, type: String, content: String): Activity
-    deleteActivity(activityId: ID!): Activity
-
     addDragDrop(
       title: String!
       description: String
       category: String
       difficulty: String
       imageUrl: String
-      activities: [ID]
       notes: [NoteInput]
       tags: [String]
       items: [ItemInput]
@@ -374,7 +355,6 @@ const typeDefs = gql`
       category: String
       difficulty: String
       imageUrl: String
-      activities: [ID]
       notes: [NoteInput]
       tags: [String]
       items: [ItemInput]
@@ -415,7 +395,7 @@ const typeDefs = gql`
     profileSettings: ProfileSettingsInput
     accessibility: AccessibilitySettingsInput
     notificationSettings: NotificationSettingsInput
-    privacySettings: PrivacySettingsInput
+    privacySettingsInput: PrivacySettingsInput
     securitySettings: SecuritySettingsInput
   }
 
