@@ -10,11 +10,7 @@ const {
   Flashcard,
   DragDrop,
 } = require("../models");
-const {
-  signToken,
-  authMiddleware,
-  AuthenticationError,
-} = require("../utils/auth");
+const { signToken, AuthenticationError } = require("../utils/auth");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -29,53 +25,280 @@ const resolvers = {
     users: async () => User.find(),
     user: async (parent, { id }) => User.findById(id),
 
-    certifications: async (parent, args, context) => {
-      const certifications = await Certification.find().populate("chapters");
+    certifications: async () => {
+      // Return basic information about all certifications
+      return Certification.find().select("title description price");
+    },
+
+    certification: async (parent, { id }, context) => {
+      const certification = await Certification.findById(id).populate(
+        "chapters"
+      );
+
       if (context.user) {
         const user = await User.findById(context.user._id);
-        const purchasedCertifications = user.purchasedCertifications.map((p) =>
-          p.certificationId.toString()
+        const hasPurchased = user.purchasedCertifications.some(
+          (p) => p.certificationId.toString() === id
         );
-        return certifications.map((cert) => ({
-          ...cert.toObject(),
-          isPurchased: purchasedCertifications.includes(cert._id.toString()),
-        }));
+
+        if (hasPurchased) {
+          return certification;
+        }
       }
-      return certifications.map((cert) => ({
-        ...cert.toObject(),
-        isPurchased: false,
-      }));
+
+      // If the user hasn't purchased the certification, only return basic details
+      return {
+        _id: certification._id,
+        title: certification.title,
+        description: certification.description,
+        price: certification.price,
+      };
     },
-    certification: async (parent, { id }) =>
-      Certification.findById(id).populate("chapters"),
 
-    chapters: async (parent, { certificationId }) =>
-      Certification.findById(certificationId).populate("chapters"),
-    chapter: async (parent, { id }) =>
-      Chapter.findById(id).populate("quizzes notecards flashcards dragdrops"),
+    chapters: async (parent, { certificationId }, context) => {
+      const certification = await Certification.findById(certificationId);
 
-    quizzes: async (parent, { chapterId }) =>
-      Chapter.findById(chapterId).populate("quizzes"),
-    quiz: async (parent, { id }) => Quiz.findById(id),
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
 
-    notecards: async (parent, { chapterId }) =>
-      Chapter.findById(chapterId).populate("notecards"),
-    notecard: async (parent, { id }) => Notecard.findById(id),
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === certificationId
+      );
 
-    flashcards: async (parent, { chapterId }) =>
-      Chapter.findById(chapterId).populate("flashcards"),
-    flashcard: async (parent, { id }) => Flashcard.findById(id),
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
 
-    dragDrops: async () => DragDrop.find(),
-    dragDrop: async (parent, { id }) => DragDrop.findById(id),
+      return certification.chapters;
+    },
 
-    progress: async (parent, { userId }) =>
-      User.findById(userId).populate("progress.chapterId"),
-    quizScores: async (parent, { userId, quizId }) =>
-      User.findOne({
-        _id: userId,
-        "progress.quizScores.quizId": quizId,
-      }),
+    chapter: async (parent, { id }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const chapter = await Chapter.findById(id).populate(
+        "quizzes notecards flashcards dragdrops"
+      );
+      const cert = await Certification.findOne({ chapters: id });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return chapter;
+    },
+
+    quizzes: async (parent, { chapterId }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const chapter = await Chapter.findById(chapterId);
+      const cert = await Certification.findOne({ chapters: chapterId });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return chapter.quizzes;
+    },
+
+    quiz: async (parent, { id }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const quiz = await Quiz.findById(id);
+      const chapter = await Chapter.findOne({ quizzes: id });
+      const cert = await Certification.findOne({ chapters: chapter._id });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return quiz;
+    },
+
+    notecards: async (parent, { chapterId }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const chapter = await Chapter.findById(chapterId);
+      const cert = await Certification.findOne({ chapters: chapterId });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return chapter.notecards;
+    },
+
+    notecard: async (parent, { id }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const notecard = await Notecard.findById(id);
+      const chapter = await Chapter.findOne({ notecards: id });
+      const cert = await Certification.findOne({ chapters: chapter._id });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return notecard;
+    },
+
+    flashcards: async (parent, { chapterId }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const chapter = await Chapter.findById(chapterId);
+      const cert = await Certification.findOne({ chapters: chapterId });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return chapter.flashcards;
+    },
+
+    flashcard: async (parent, { id }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const flashcard = await Flashcard.findById(id);
+      const chapter = await Chapter.findOne({ flashcards: id });
+      const cert = await Certification.findOne({ chapters: chapter._id });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return flashcard;
+    },
+
+    dragDrops: async (parent, args, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const dragDrops = await DragDrop.find();
+      const user = await User.findById(context.user._id);
+      const purchasedChapters = user.purchasedCertifications.flatMap(
+        (p) => p.certificationId.chapters
+      );
+
+      return dragDrops.filter((dragDrop) =>
+        purchasedChapters.includes(dragDrop.chapter)
+      );
+    },
+
+    dragDrop: async (parent, { id }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      const dragDrop = await DragDrop.findById(id);
+      const chapter = await Chapter.findOne({ dragdrops: id });
+      const cert = await Certification.findOne({ chapters: chapter._id });
+
+      const user = await User.findById(context.user._id);
+      const hasPurchased = user.purchasedCertifications.some(
+        (p) => p.certificationId.toString() === cert._id.toString()
+      );
+
+      if (!hasPurchased) {
+        throw new AuthenticationError(
+          "You have not purchased this certification!"
+        );
+      }
+
+      return dragDrop;
+    },
+
+    progress: async (parent, args, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      // Return progress only for the authenticated user
+      const user = await User.findById(context.user._id).populate(
+        "progress.chapterId"
+      );
+      return user.progress;
+    },
+
+    quizScores: async (parent, { quizId }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      // Fetch only the quiz scores for the authenticated user
+      const user = await User.findById(context.user._id);
+      const quizScore = user.progress.find(
+        (progress) => progress.quizScores.quizId.toString() === quizId
+      );
+      return quizScore ? quizScore.scores : [];
+    },
+
     studySessions: async (parent, { userId }) =>
       User.findById(userId).populate("studySessions"),
     transactions: async (parent, { userId }) =>

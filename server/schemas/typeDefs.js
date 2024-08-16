@@ -22,124 +22,26 @@ const typeDefs = gql`
     transactionHistory: [Transaction]
   }
 
-  type Settings {
-    profileSettings: ProfileSettings
-    accessibility: AccessibilitySettings
-    notificationSettings: NotificationSettings
-    privacySettings: PrivacySettings
-    securitySettings: SecuritySettings
-  }
-
-  type ProfileSettings {
-    username: String
-    email: String
-    profilePhoto: String
-  }
-
-  type AccessibilitySettings {
-    darkMode: Boolean
-    fontSize: String
-    language: String
-    timeZone: String
-  }
-
-  type NotificationSettings {
-    emailPreferences: EmailPreferences
-    inAppNotifications: Boolean
-    pushNotifications: Boolean
-  }
-
-  type EmailPreferences {
-    promotions: Boolean
-    progressNotifications: Boolean
-    newsletter: Boolean
-  }
-
-  type PrivacySettings {
-    dataSharing: Boolean
-    viewDownloadData: Boolean
-  }
-
-  type SecuritySettings {
-    recentActivity: [RecentActivity]
-    twoFactorAuth: Boolean
-    cookieSettings: CookieSettings
-  }
-
-  type RecentActivity {
-    date: String
-    action: String
-  }
-
-  type CookieSettings {
-    functional: Boolean
-    analytics: Boolean
-    marketing: Boolean
-  }
-
-  type StudySession {
-    date: String
-    duration: Int
-    activityType: String
-  }
-
-  type ChapterProgress {
-    chapterId: ID!
-    completion: Int
-    quizScores: [QuizScore]
-    notecardScores: [Score]
-    flashcardScores: [Score]
-  }
-
-  type QuizScore {
-    quizId: ID!
-    scores: [Score]
-  }
-
-  type Score {
-    date: String
-    score: Int
-  }
-
   type Certification {
     _id: ID!
     title: String!
     description: String
     chapters: [Chapter]
     price: Float!
-    isPurchased: Boolean!
+  }
+
+  # This type might be optional if you prefer using Certification type for both cases.
+  type PublicCertification {
+    _id: ID!
+    title: String!
+    description: String
+    price: Float!
   }
 
   type CertificationPurchase {
     certificationId: ID!
     purchaseDate: String
     price: Float
-  }
-
-  type PaymentMethod {
-    _id: ID!
-    stripePaymentMethodId: String!
-    brand: String
-    last4: String
-    expMonth: Int
-    expYear: Int
-    isDefault: Boolean
-  }
-
-  type Transaction {
-    _id: ID!
-    stripeTransactionId: String!
-    amount: Float
-    currency: String
-    status: String
-    created: String
-    certificationId: ID
-  }
-
-  type PaymentIntent {
-    clientSecret: String!
-    amount: Float!
-    currency: String!
   }
 
   type Chapter {
@@ -238,12 +140,117 @@ const typeDefs = gql`
     dropZoneId: ID!
   }
 
+  type Settings {
+    profileSettings: ProfileSettings
+    accessibility: AccessibilitySettings
+    notificationSettings: NotificationSettings
+    privacySettings: PrivacySettings
+    securitySettings: SecuritySettings
+  }
+
+  type ProfileSettings {
+    username: String
+    email: String
+    profilePhoto: String
+  }
+
+  type AccessibilitySettings {
+    darkMode: Boolean
+    fontSize: String
+    language: String
+    timeZone: String
+  }
+
+  type NotificationSettings {
+    emailPreferences: EmailPreferences
+    inAppNotifications: Boolean
+    pushNotifications: Boolean
+  }
+
+  type EmailPreferences {
+    promotions: Boolean
+    progressNotifications: Boolean
+    newsletter: Boolean
+  }
+
+  type PrivacySettings {
+    dataSharing: Boolean
+    viewDownloadData: Boolean
+  }
+
+  type SecuritySettings {
+    recentActivity: [RecentActivity]
+    twoFactorAuth: Boolean
+    cookieSettings: CookieSettings
+  }
+
+  type RecentActivity {
+    date: String
+    action: String
+  }
+
+  type CookieSettings {
+    functional: Boolean
+    analytics: Boolean
+    marketing: Boolean
+  }
+
+  type StudySession {
+    date: String
+    duration: Int
+    activityType: String
+  }
+
+  type ChapterProgress {
+    chapterId: ID!
+    completion: Int
+    quizScores: [QuizScore]
+    notecardScores: [Score]
+    flashcardScores: [Score]
+  }
+
+  type QuizScore {
+    quizId: ID!
+    scores: [Score]
+  }
+
+  type Score {
+    date: String
+    score: Int
+  }
+
+  type Transaction {
+    _id: ID!
+    stripeTransactionId: String!
+    amount: Float
+    currency: String
+    status: String
+    created: String
+    certificationId: ID
+  }
+
+  type PaymentMethod {
+    _id: ID!
+    stripePaymentMethodId: String!
+    brand: String
+    last4: String
+    expMonth: Int
+    expYear: Int
+    isDefault: Boolean
+  }
+
+  type PaymentIntent {
+    clientSecret: String!
+    amount: Float!
+    currency: String!
+  }
+
   type Query {
     me: User
     users: [User]
     user(id: ID!): User
-    certifications: [Certification]
-    certification(id: ID!): Certification
+    certifications: [Certification] # or [PublicCertification]
+    certification(id: ID!): Certification # or PublicCertification if certification is not purchased
     chapters(certificationId: ID!): [Chapter]
     chapter(id: ID!): Chapter
     quizzes(chapterId: ID!): [Quiz]
@@ -259,6 +266,7 @@ const typeDefs = gql`
     studySessions(userId: ID!): [StudySession]
     transactions(userId: ID!): [Transaction]
     paymentMethods(userId: ID!): [PaymentMethod]
+    certificationPurchase(id: ID!): CertificationPurchase
   }
 
   type Mutation {
@@ -387,7 +395,7 @@ const typeDefs = gql`
     profileSettings: ProfileSettingsInput
     accessibility: AccessibilitySettingsInput
     notificationSettings: NotificationSettingsInput
-    privacySettings: PrivacySettingsInput
+    privacySettingsInput: PrivacySettingsInput
     securitySettings: SecuritySettingsInput
   }
 

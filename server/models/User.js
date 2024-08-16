@@ -27,6 +27,7 @@ const UserSchema = new Schema(
     },
     profilePicture: {
       type: String,
+      default: "default-profile.png", // Consider setting a default value
     },
     settings: {
       profileSettings: {
