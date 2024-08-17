@@ -1,3 +1,6 @@
+// wraps the App with Apollo & providers
+  // manages the consistent layout (header, footer)
+  // provides a space 'outlet' for route-based content
 import {
   ApolloClient,
   InMemoryCache,
@@ -7,6 +10,7 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import { Outlet } from "react-router-dom";
 
+// Imports components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -34,18 +38,20 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+// changed the 
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="flex-column justify-flex-start min-100-vh">
+      <div className="app-wrapper"> {/* a container for the whole layout */}
         <Header />
-        <div className="container">
+        <main className="main-content"> {/* a class for the content area where 'Outlet' is used */}
           <Outlet />
-        </div>
+        </main> 
         <Footer />
       </div>
     </ApolloProvider>
   );
 }
+
 
 export default App;

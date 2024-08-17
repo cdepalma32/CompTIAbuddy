@@ -66,3 +66,15 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+
+/* ADDED .app-wrapper & .main-content!!!!!!! */
+.app-wrapper { /* Add this class to handle the app-wide layout */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures the layout covers the full viewport height */
+}
+
+.main-content { /* Add this class for content area styling */
+  flex: 1; /* Ensures the content area expands to fill available space */
+}
