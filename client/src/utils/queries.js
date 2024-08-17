@@ -208,16 +208,15 @@ export const QUERY_USER = gql`
 
 // Query to fetch all certifications
 export const QUERY_CERTIFICATIONS = gql`
-  query certifications {
+  query Certifications {
     certifications {
       _id
       title
       description
+      price
       chapters {
-        _id
         title
       }
-      isPurchased
     }
   }
 `;
@@ -250,7 +249,6 @@ export const QUERY_CERTIFICATION = gql`
           title
         }
       }
-      isPurchased
     }
   }
 `;

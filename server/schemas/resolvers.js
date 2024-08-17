@@ -26,8 +26,10 @@ const resolvers = {
     user: async (parent, { id }) => User.findById(id),
 
     certifications: async () => {
-      // Return basic information about all certifications
-      return Certification.find().select("title description price");
+      // Populate the chapters field when querying for certifications
+      return Certification.find()
+        .populate("chapters")
+        .select("title description price");
     },
 
     certification: async (parent, { id }, context) => {
