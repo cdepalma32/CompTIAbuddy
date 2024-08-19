@@ -313,7 +313,7 @@ export const QUERY_QUIZZES = gql`
     quizzes(chapterId: $chapterId) {
       _id
       question
-      correctAnswer
+      answer
     }
   }
 `;
@@ -324,7 +324,7 @@ export const QUERY_QUIZ = gql`
     quiz(id: $id) {
       _id
       question
-      correctAnswer
+      answer
     }
   }
 `;

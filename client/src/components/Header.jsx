@@ -1,28 +1,45 @@
-import React from "react";
+import { Link } from "react-router-dom";
+import Auth from "../utils/auth";
 
 const Header = () => {
+  const logout = (event) => {
+    event.preventDefault();
+    Auth.logout();
+  };
+
   return (
-    <header style={styles.container}>
-      <h1 style={styles.title}>This is Header.jsx</h1>
+    <header className="bg-primary text-light mb-4 py-3 flex-row align-center">
+      <div className="container flex-row justify-space-between-lg justify-center align-center">
+        <div>
+          <Link className="text-light" to="/">
+            <h1 className="m-0">CompTIA Buddy</h1>
+          </Link>
+          <p className="m-0">Study for your CompTIA exams with ease!</p>
+        </div>
+        <div>
+          {Auth.loggedIn() ? (
+            <>
+              <Link className="btn btn-lg btn-info m-2" to="/me">
+                {Auth.getProfile().username}'s profile {/* Fixed this line */}
+              </Link>
+              <button className="btn btn-lg btn-light m-2" onClick={logout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="btn btn-lg btn-info m-2" to="/login">
+                Login
+              </Link>
+              <Link className="btn btn-lg btn-light m-2" to="/signup">
+                Signup
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
     </header>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "80px",
-    backgroundColor: "#007bff", // Bootstrap primary color
-    color: "#fff",
-    padding: "10px",
-    boxSizing: "border-box",
-    width: "100%",
-  },
-  title: {
-    fontSize: "1.5rem",
-  },
 };
 
 export default Header;
