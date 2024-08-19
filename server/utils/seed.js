@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const clearDatabase = require("./clearDatabase");
-const { User } = require("../models");
+const { User, Certification, Chapter } = require("../models");
 const bcrypt = require("bcrypt");
 
 // Load environment variables
@@ -9,13 +9,18 @@ dotenv.config();
 
 const seedData = async () => {
   try {
-    console.log("Step 1: Clearing the database...🌱");
-    await clearDatabase(); // Clears the database once at the start
+    console.log("Step 1: Clearing the entire database...🌱");
+    await clearDatabase(); // Clear the entire database
     console.log("Database cleared successfully.🌱");
 
     console.log("Step 2: Seeding users...🌱");
 
     const users = [
+      {
+        username: "lovey",
+        email: "email@email.com",
+        password: "password",
+      },
       {
         username: "lovey1",
         email: "email1@email.com",
@@ -42,7 +47,56 @@ const seedData = async () => {
     const insertedUsers = await User.insertMany(users);
     console.log(`Inserted ${insertedUsers.length} users successfully.🌱`);
 
-    console.log("Step 3: Closing database connection...🌱");
+    console.log("Step 3: Seeding certifications...🌱");
+
+    const certifications = [
+      {
+        title: "CompTIA A+",
+        description: "Entry-level certification for IT professionals.",
+        price: 199.99,
+      },
+      {
+        title: "CompTIA Security+",
+        description: "Certification for cybersecurity professionals.",
+        price: 299.99,
+      },
+    ];
+
+    const insertedCertifications = await Certification.insertMany(
+      certifications
+    );
+    console.log(
+      `Inserted ${insertedCertifications.length} certifications successfully.🌱`
+    );
+
+    console.log("Step 4: Seeding chapters...🌱");
+
+    // Create chapters and associate them with certifications
+    const chapters = [
+      {
+        title: "Chapter 1: Introduction to IT",
+        certification: insertedCertifications[0]._id, // Associate with CompTIA A+
+      },
+      {
+        title: "Chapter 1: Introduction to Cybersecurity",
+        certification: insertedCertifications[1]._id, // Associate with CompTIA Security+
+      },
+    ];
+
+    const insertedChapters = await Chapter.insertMany(chapters);
+    console.log(`Inserted ${insertedChapters.length} chapters successfully.🌱`);
+
+    // Update certifications with the associated chapters
+    await Certification.findByIdAndUpdate(insertedCertifications[0]._id, {
+      $push: { chapters: insertedChapters[0]._id },
+    });
+    await Certification.findByIdAndUpdate(insertedCertifications[1]._id, {
+      $push: { chapters: insertedChapters[1]._id },
+    });
+
+    console.log("Chapters successfully associated with certifications.🌱");
+
+    console.log("Step 5: Closing database connection...🌱");
     await mongoose.connection.close();
     console.log("Database connection closed.🌱");
   } catch (err) {
