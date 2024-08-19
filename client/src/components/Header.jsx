@@ -20,34 +20,49 @@ const Header = () => {
         <nav>
           <ul className="nav">
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link className="text-light text-decoration-none mx-3" to="/">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link
+                className="text-light text-decoration-none mx-3"
+                to="/certifications"
+              >
                 Certifications
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link
+                className="text-light text-decoration-none mx-3"
+                to="/dashboard"
+              >
                 Dashboard
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link
+                className="text-light text-decoration-none mx-3"
+                to="/tutorial"
+              >
                 Tutorial
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link
+                className="text-light text-decoration-none mx-3"
+                to="/about"
+              >
                 About
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-light" href="#">
+              <Link
+                className="text-light text-decoration-none mx-3"
+                to="/settings"
+              >
                 Settings
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>

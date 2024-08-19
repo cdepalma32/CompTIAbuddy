@@ -11,7 +11,7 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import Error from "./pages/Error.jsx";
 import Login from "./pages/Login.jsx";
-import Signup from "./pages/SignUp.jsx";
+import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import ActivityList from "./components/ActivityList.jsx";
 import CertificationList from "./components/CertificationList.jsx";
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
     error: <Error />, // handles any route errors (ie: 404's)
     children: [
       {
-        index: true,  // The index route for "/"
+        index: true, // The index route for "/"
         element: <Home />,
       },
       {
