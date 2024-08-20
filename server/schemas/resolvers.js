@@ -459,8 +459,11 @@ const resolvers = {
     },
 
     deleteUser: async (parent, { userId }) => {
-      await User.findByIdAndDelete(userId);
-      return `User with id ${userId} was deleted.`;
+      const user = await User.findByIdAndDelete(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user; // This returns the deleted user object, including the _id field
     },
 
     addCertification: async (parent, args) => Certification.create(args),

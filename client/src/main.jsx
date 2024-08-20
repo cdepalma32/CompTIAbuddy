@@ -1,9 +1,11 @@
-// defines routes, connects paths to the right pages/components
-
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom/dist";
-
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
+import { useQuery } from "@apollo/client";
 import App from "./App.jsx";
 import "./index.css";
 import Home from "./pages/Home.jsx";
@@ -15,7 +17,7 @@ import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import ActivityList from "./components/ActivityList.jsx";
 import CertificationList from "./components/CertificationList.jsx";
-import CertificationDetail from "./components/CertificationDetail.jsx"; // Import the new CertificationDetail component
+import CertificationDetail from "./components/CertificationDetail.jsx";
 import ChapterList from "./components/ChapterList.jsx";
 import ActivityDetail from "./pages/ActivityDetail.jsx";
 import Progress from "./pages/Progress.jsx";
@@ -25,15 +27,41 @@ import About from "./pages/About.jsx";
 import Tutorial from "./pages/Tutorial.jsx";
 import Settings from "./pages/Settings.jsx";
 import SignOut from "./pages/SignOut.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminUpdateUserForm from "./components/AdminUpdateUserForm.jsx"; // Admin update form
+import UpdateUserForm from "./components/UpdateUserForm.jsx"; // User update form
+import { QUERY_ME } from "./utils/queries"; // Import the QUERY_ME query
+
+// Protected Route for Admin Dashboard
+const ProtectedAdminRoute = ({ element }) => {
+  const { loading, error, data } = useQuery(QUERY_ME);
+
+  if (loading) return <div>Loading...</div>;
+  if (error || !data?.me) return <Navigate to="/login" />; // Redirect to login on error or if user data is missing
+
+  const isAdmin = data.me.username === "admin";
+
+  return isAdmin ? element : <Navigate to="/" />; // Redirect to home if not admin
+};
+
+// Protected Route for User Profile
+const ProtectedUserRoute = ({ element }) => {
+  const { loading, error, data } = useQuery(QUERY_ME);
+
+  if (loading) return <div>Loading...</div>;
+  if (error || !data?.me) return <Navigate to="/login" />; // Redirect to login on error or if user data is missing
+
+  return element; // Allow access if user is logged in
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // app wraps the main layout
-    error: <Error />, // handles any route errors (ie: 404's)
+    element: <App />,
+    error: <Error />,
     children: [
       {
-        index: true, // The index route for "/"
+        index: true,
         element: <Home />,
       },
       {
@@ -57,7 +85,7 @@ const router = createBrowserRouter([
         element: <CertificationList />,
       },
       {
-        path: "/certifications/:id", // New route for displaying a single certification
+        path: "/certifications/:id",
         element: <CertificationDetail />,
       },
       {
@@ -79,6 +107,18 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/admin",
+        element: <ProtectedAdminRoute element={<AdminDashboard />} />,
+      },
+      {
+        path: "/admin/update-user/:userId", // Admin update user route
+        element: <ProtectedAdminRoute element={<AdminUpdateUserForm />} />,
+      },
+      {
+        path: "/update-user", // User update profile route
+        element: <ProtectedUserRoute element={<UpdateUserForm />} />,
       },
       {
         path: "/landing",

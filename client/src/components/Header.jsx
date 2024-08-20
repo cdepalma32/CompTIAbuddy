@@ -1,12 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { QUERY_ME } from "../utils/queries";
 import Auth from "../utils/auth";
 
 const Header = () => {
+  const { loading, error, data } = useQuery(QUERY_ME);
+
   const logout = (event) => {
     event.preventDefault();
     Auth.logout();
   };
+
+  useEffect(() => {
+    if (data && data.me) {
+      console.log("User data:", data.me);
+    }
+  }, [data]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.error("Error fetching user data:", error);
+  }
+
+  // Check if the user is admin based on the username from the query
+  const isAdmin = data?.me?.username === "admin";
 
   return (
     <header className="bg-primary text-light mb-4 py-3">
@@ -64,14 +85,24 @@ const Header = () => {
                 Settings
               </Link>
             </li>
+            {isAdmin && (
+              <li className="nav-item">
+                <Link
+                  className="text-light text-decoration-none mx-3"
+                  to="/admin"
+                >
+                  Admin Dashboard
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
         <div>
           {Auth.loggedIn() ? (
             <>
-              <Link className="btn btn-info btn-lg me-2" to="/me">
-                {Auth.getProfile().username}'s Dashboard
-              </Link>
+              {/* <Link className="btn btn-info btn-lg me-2" to="/me">
+                {data?.me?.username || "User"}'s Dashboard
+              </Link> */}
               <button className="btn btn-light btn-lg" onClick={logout}>
                 Logout
               </button>
