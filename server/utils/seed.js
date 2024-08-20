@@ -53,7 +53,7 @@ const seedData = async () => {
       {
         title: "CompTIA A+",
         description: "Entry-level certification for IT professionals.",
-        price: 199.99,
+        price: 0,
       },
       {
         title: "CompTIA Security+",

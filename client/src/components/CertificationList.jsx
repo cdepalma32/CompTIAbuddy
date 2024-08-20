@@ -34,7 +34,10 @@ const CertificationList = () => {
               <div className="card-body">
                 <h5 className="card-title">{certification.title}</h5>
                 <p className="card-text">{certification.description}</p>
-                <Link to="#" className="btn btn-primary">
+                <Link
+                  to={`/certifications/${certification._id}`} // Updated to navigate to the certification detail page
+                  className="btn btn-primary"
+                >
                   Learn More
                 </Link>
               </div>

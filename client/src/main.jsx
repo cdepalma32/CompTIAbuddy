@@ -15,6 +15,7 @@ import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import ActivityList from "./components/ActivityList.jsx";
 import CertificationList from "./components/CertificationList.jsx";
+import CertificationDetail from "./components/CertificationDetail.jsx"; // Import the new CertificationDetail component
 import ChapterList from "./components/ChapterList.jsx";
 import ActivityDetail from "./pages/ActivityDetail.jsx";
 import Progress from "./pages/Progress.jsx";
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/certifications",
         element: <CertificationList />,
+      },
+      {
+        path: "/certifications/:id", // New route for displaying a single certification
+        element: <CertificationDetail />,
       },
       {
         path: "/certifications/:certificationId/chapters",

@@ -104,6 +104,17 @@ export const UPDATE_USER = gql`
   }
 `;
 
+// mutation to add free certification to user
+export const ADD_FREE_CERTIFICATION = gql`
+  mutation AddFreeCertification($certificationId: ID!) {
+    addFreeCertification(certificationId: $certificationId) {
+      certificationId
+      price
+      purchaseDate
+    }
+  }
+`;
+
 // Mutation to delete a user
 export const DELETE_USER = gql`
   mutation deleteUser($userId: ID!) {
