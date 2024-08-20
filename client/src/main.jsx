@@ -29,6 +29,7 @@ import Settings from "./pages/Settings.jsx";
 import SignOut from "./pages/SignOut.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminUpdateUserForm from "./components/AdminUpdateUserForm.jsx"; // Admin update form
+import AdminUpdateCertificationForm from "./components/AdminUpdateCertificationForm.jsx"; // Admin update form
 import UpdateUserForm from "./components/UpdateUserForm.jsx"; // User update form
 import { QUERY_ME } from "./utils/queries"; // Import the QUERY_ME query
 
@@ -116,6 +117,11 @@ const router = createBrowserRouter([
         path: "/admin/update-user/:userId", // Admin update user route
         element: <ProtectedAdminRoute element={<AdminUpdateUserForm />} />,
       },
+      {
+        path: "/admin/update-certification/:certificationId",
+        element: <AdminUpdateCertificationForm />,
+      },
+
       {
         path: "/update-user", // User update profile route
         element: <ProtectedUserRoute element={<UpdateUserForm />} />,

@@ -467,8 +467,22 @@ const resolvers = {
     },
 
     addCertification: async (parent, args) => Certification.create(args),
-    updateCertification: async (parent, { certificationId, ...updates }) =>
-      Certification.findByIdAndUpdate(certificationId, updates, { new: true }),
+    updateCertification: async (parent, { certificationId, ...updates }) => {
+      try {
+        const updatedCertification = await Certification.findByIdAndUpdate(
+          certificationId,
+          updates,
+          { new: true }
+        );
+        if (!updatedCertification) {
+          throw new Error("Certification not found");
+        }
+        return updatedCertification;
+      } catch (error) {
+        throw new Error(`Error updating certification: ${error.message}`);
+      }
+    },
+
     deleteCertification: async (parent, { certificationId }) =>
       Certification.findByIdAndDelete(certificationId),
 
