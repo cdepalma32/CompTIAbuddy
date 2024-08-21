@@ -300,6 +300,8 @@ const typeDefs = gql`
       amount: Float!
     ): CertificationPurchase
 
+    addFreeCertification(certificationId: ID!): [CertificationPurchase]
+
     addChapter(
       certificationId: ID!
       title: String!

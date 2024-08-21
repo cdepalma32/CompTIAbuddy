@@ -104,6 +104,17 @@ export const UPDATE_USER = gql`
   }
 `;
 
+// mutation to add free certification to user
+export const ADD_FREE_CERTIFICATION = gql`
+  mutation AddFreeCertification($certificationId: ID!) {
+    addFreeCertification(certificationId: $certificationId) {
+      certificationId
+      price
+      purchaseDate
+    }
+  }
+`;
+
 // Mutation to delete a user
 export const DELETE_USER = gql`
   mutation deleteUser($userId: ID!) {
@@ -134,21 +145,24 @@ export const ADD_CERTIFICATION = gql`
   }
 `;
 
-// Mutation to update a certification
+// mutation to update a certification
 export const UPDATE_CERTIFICATION = gql`
   mutation updateCertification(
     $certificationId: ID!
     $title: String
     $description: String
+    $price: Float
   ) {
     updateCertification(
       certificationId: $certificationId
       title: $title
       description: $description
+      price: $price
     ) {
       _id
       title
       description
+      price
     }
   }
 `;

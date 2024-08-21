@@ -37,23 +37,26 @@ const resolvers = {
         "chapters"
       );
 
+      // Check if the user is logged in
       if (context.user) {
         const user = await User.findById(context.user._id);
         const hasPurchased = user.purchasedCertifications.some(
           (p) => p.certificationId.toString() === id
         );
 
+        // If the user has purchased the certification, return the full certification data
         if (hasPurchased) {
           return certification;
         }
       }
 
-      // If the user hasn't purchased the certification, only return basic details
+      // If the user hasn't purchased the certification, return the certification without chapters
       return {
         _id: certification._id,
         title: certification.title,
         description: certification.description,
         price: certification.price,
+        chapters: null, // Explicitly set chapters to null
       };
     },
 
@@ -382,14 +385,104 @@ const resolvers = {
       const user = await User.findByIdAndUpdate(userId, updates, { new: true });
       return user;
     },
+
+    addFreeCertification: async (parent, { certificationId }, context) => {
+      try {
+        console.log("using resolver addFreeCertification");
+        // Check if user is logged in
+        console.log("Checking if user is authenticated...");
+        if (!context.user) {
+          console.error("User not authenticated");
+          throw new AuthenticationError("You need to be logged in!");
+        }
+
+        // Fetch the certification
+        console.log(`Fetching certification with ID: ${certificationId}`);
+        const certification = await Certification.findById(certificationId);
+        if (!certification) {
+          console.error(`Certification not found for ID: ${certificationId}`);
+          throw new Error("Certification not found");
+        }
+
+        // Ensure the certification is free
+        console.log(`Checking if certification is free...`);
+        if (certification.price > 0) {
+          console.error(
+            `Certification with ID: ${certificationId} is not free (Price: ${certification.price})`
+          );
+          throw new Error("This certification is not free");
+        }
+
+        // Fetch the user
+        console.log(`Fetching user with ID: ${context.user._id}`);
+        const user = await User.findById(context.user._id);
+        if (!user) {
+          console.error(`User not found with ID: ${context.user._id}`);
+          throw new Error("User not found");
+        }
+
+        // Check if the user already owns this certification
+        console.log(`Checking if user already owns certification...`);
+        const alreadyPurchased = user.purchasedCertifications.some(
+          (p) => p.certificationId.toString() === certificationId
+        );
+        if (alreadyPurchased) {
+          console.warn(
+            `User ${context.user._id} already owns certification with ID: ${certificationId}`
+          );
+          throw new Error("You already own this certification");
+        }
+
+        // Add the certification to the user's purchased certifications
+        console.log(`Adding certification to user...`);
+        user.purchasedCertifications.push({
+          certificationId,
+          purchaseDate: new Date().toISOString(),
+          price: certification.price, // Should be 0 for free certifications
+        });
+
+        // Save the updated user
+        await user.save();
+        console.log(
+          `Certification with ID: ${certificationId} added to user ${context.user._id}`
+        );
+
+        return user.purchasedCertifications;
+      } catch (error) {
+        console.error(`Error in addFreeCertification: ${error.message}`, {
+          certificationId,
+          userId: context.user?._id,
+          stack: error.stack,
+        });
+        throw new Error(`Failed to add free certification: ${error.message}`);
+      }
+    },
+
     deleteUser: async (parent, { userId }) => {
-      await User.findByIdAndDelete(userId);
-      return `User with id ${userId} was deleted.`;
+      const user = await User.findByIdAndDelete(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user; // This returns the deleted user object, including the _id field
     },
 
     addCertification: async (parent, args) => Certification.create(args),
-    updateCertification: async (parent, { certificationId, ...updates }) =>
-      Certification.findByIdAndUpdate(certificationId, updates, { new: true }),
+    updateCertification: async (parent, { certificationId, ...updates }) => {
+      try {
+        const updatedCertification = await Certification.findByIdAndUpdate(
+          certificationId,
+          updates,
+          { new: true }
+        );
+        if (!updatedCertification) {
+          throw new Error("Certification not found");
+        }
+        return updatedCertification;
+      } catch (error) {
+        throw new Error(`Error updating certification: ${error.message}`);
+      }
+    },
+
     deleteCertification: async (parent, { certificationId }) =>
       Certification.findByIdAndDelete(certificationId),
 

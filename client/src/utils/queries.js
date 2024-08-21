@@ -221,13 +221,13 @@ export const QUERY_CERTIFICATIONS = gql`
   }
 `;
 
-// Query to fetch a specific certification by ID
 export const QUERY_CERTIFICATION = gql`
   query certification($id: ID!) {
     certification(id: $id) {
       _id
       title
       description
+      price
       chapters {
         _id
         title
@@ -313,7 +313,7 @@ export const QUERY_QUIZZES = gql`
     quizzes(chapterId: $chapterId) {
       _id
       question
-      correctAnswer
+      answer
     }
   }
 `;
@@ -324,7 +324,7 @@ export const QUERY_QUIZ = gql`
     quiz(id: $id) {
       _id
       question
-      correctAnswer
+      answer
     }
   }
 `;
