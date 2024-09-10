@@ -1,6 +1,7 @@
 const db = require("../config/connection");
 
 module.exports = async () => {
+  console.log("i got to line 4");
   try {
     await new Promise((resolve, reject) => {
       db.once("open", async () => {
