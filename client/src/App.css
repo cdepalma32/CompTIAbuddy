@@ -1,4 +1,46 @@
-/* ADDED .app-wrapper & .main-content!!!!!!! */
+/* Custom Styling for About Component */
+
+.about-container {
+  background-color: #f8f9fa; /* Light background color for contrast */
+  padding: 40px 15px; /* Padding around the container */
+  border-radius: 8px; /* Rounded corners for the container */
+}
+
+.section-heading {
+  border-bottom: 2px solid #007bff; /* Blue border under headings for emphasis */
+  padding-bottom: 10px; /* Space below the heading text */
+}
+
+.final-message {
+  font-style: italic; /* Italicize the final message */
+  color: #495057; /* Slightly darker text color for emphasis */
+}
+
+/* Ensure the spacing between paragraphs and sections is consistent */
+.mb-4 {
+  margin-bottom: 2rem; /* More space below paragraphs */
+}
+
+
+/* Custom styling for Error Page */
+
+.error-container {
+  background-color: #f8f9fa; /* Light background color for contrast */
+  padding: 40px 15px; /* Padding around the container */
+  border-radius: 8px; /* Rounded corners for the container */
+}
+
+.display-4 {
+  color: #000000; /* Bootstrap danger color for error title */
+}
+
+.lead {
+  color: #333; /* Darker text color for the message */
+}
+
+
+
+
 
 /* Ensures the wrapper takes up the full height of the viewport */
 .app-wrapper {
